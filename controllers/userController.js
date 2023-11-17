@@ -1,6 +1,7 @@
 import UserModel from '../models/User.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import transporter from '../config/emailConfig.js';
 
 
 
@@ -104,6 +105,15 @@ class UserController{
                 const  token = jwt.sign({userId:user._id},secret,{expiresIn:'15m'});
                 const link = `http://localhost:8000/api/user/reset-password/${user._id}/${token}`;
                 console.log(link);
+                //Send Email 
+                const info = await transporter.sendMail({
+                    from:process.env.EMAIL_FROM,
+                    to: user.email,
+                    subject: "ExpressAuthjwt Prectice Project [ Reset Password ]",
+                    html: `<a href=${link}>click here</a> to Reset Your Password`
+                })
+                //--------------------------------------------
+                console.log(info);
                 res.send({"status":"success","message":"Password Reset Email Send Successfully ! "});
 
             }else{
